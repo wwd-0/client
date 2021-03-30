@@ -9,7 +9,7 @@ class myThread(threading.Thread):
         threading.Thread.__init__(self)
 
     def run(self):
-        print("myThread 开始线程：" + self.name)
+        print("myThread 开始线程：")
 
 class SocketHelper(myThread):
     def __init__(self):
@@ -23,26 +23,31 @@ class SocketHelper(myThread):
         try:
             # 尝试连接服务端
             self.sock.connect(self.address)
-            self.recvMsg()
-        except Exception:
-            print('[!] Server not found ot not open')
-            sys.exit()
 
-    def stop(self):
+            self.sendMsg("sdfdsfddddddddddddddddddddddddd")
+
+            self.recvMsg()
+        except Exception as e:
+            print('[!] Server not found ot not open',e)
+
+    def stopClient(self):
+        self.stop = True
         self.sock.close()
 
-    def sendMsg(self):
-        trigger = input('Input: ')
-        self.sock.sendall(trigger.encode())
+    def sendMsg(self,msg):
+        self.sock.sendall(msg.encode())
 
     def recvMsg(self):
         while not self.stop:
             data = self.sock.recv(1024)
-            data = data.decode()
-            print('[Recieved]', data)
+            if data:
+                data = data.decode()
+                print('[Recieved]', data)
+            else:
+                return self.stopClient()
 
     def run(self):
-        print("SocketHelper 开始线程：" + self.name)
+        print("SocketHelper 开始线程：")
         # 服务端地址和端口
         ip = socket.gethostbyname("www.wuweidong.site")
         self.address = (ip,9000)
